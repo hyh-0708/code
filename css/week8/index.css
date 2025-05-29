@@ -1,0 +1,178 @@
+.center8 {
+  background: #000;
+}
+.wookBanner {
+  width: 100%;
+  height: 460px;
+  display: flex;
+  justify-content: center;
+}
+.leftBanner {
+  width: 25%;
+  height: 100%;
+  background: url("../../img/week8/img1.png") center center no-repeat;
+  background-size: 100% 100%;
+}
+.rightBanner {
+  width: 50%;
+  height: 100%;
+  background: url("../../img/week8/img2.png") center center no-repeat;
+  background-size: 100% 100%;
+}
+
+.module {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 0 20px 0;
+  color: #fff;
+}
+
+.centerMainBox {
+  width: 60%;
+  border-radius: 5px;
+  overflow: hidden;
+}
+.top8 {
+  background-color: rgb(25, 25, 25);
+  width: 100%;
+  height: 50px;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bottom8 {
+  padding: 30px;
+  color: #fff;
+  overflow-y: auto;
+  flex: 1;
+  background-color: rgb(37, 37, 37);
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.module2 {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+}
+.module2 .top {
+  text-align: left;
+  margin-bottom: 10px;
+}
+.module2 .bottom {
+  width: 100%;
+  height: 300px;
+  display: flex;
+}
+.module2 .img3 {
+  width: 40%;
+  background: url("../../img/week8/img3.png") center center no-repeat;
+  background-size: 100% 100%;
+}
+.module2 .img4 {
+  width: 59%;
+  background: url("../../img/week8/img4.png") center center no-repeat;
+  background-size: 100% 100%;
+}
+
+.module3 {
+  width: 70%;
+  height: 1px;
+  background: #fff;
+}
+.module4 {
+  width: 60%;
+  height: 450px;
+  display: flex;
+}
+.module4 .img5 {
+  width: 40%;
+  height: 100%;
+  background: url("../../img/week8/img5.png") center center no-repeat;
+  background-size: 100% 100%;
+}
+.module4 .img6 {
+  width: 59%;
+  height: 100%;
+  background: url("../../img/week8/img6.png") center center no-repeat;
+  background-size: 100% 100%;
+}
+
+.module6 {
+  width: 60%;
+  height: 450px;
+  display: flex;
+}
+.module6 .img7 {
+  width: 40%;
+  height: 100%;
+  background: url("../../img/week8/img7.png") center center no-repeat;
+  background-size: 100% 100%;
+}
+
+.module6 .video8 {
+  width: 59%;
+  height: 97%;
+  position: relative;
+  border-radius: 4px;
+}
+
+.module6 .video8 video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scaleX(3.2); /* 横向拉伸20%，数值可调整 */
+  transform-origin: center; /* 从中心拉伸 */
+}
+.centerBox {
+  width: 60%;
+  display: flex;
+  flex-direction: column;
+}
+.top8 {
+  background-color: rgb(25, 25, 25);
+  width: 100%;
+  height: 50px;
+  color: #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.bottom8 {
+  padding: 30px;
+  color: #fff;
+  overflow-y: auto;
+  flex: 1;
+  background-color: rgb(37, 37, 37);
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.module8 {
+  width: 60%;
+  height: 430px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.module8 .img9 {
+  width: 59%;
+  height: 100%;
+  background: url("../../img/week8/img9.png") center center no-repeat;
+  background-size: 100% 100%;
+  transform: scale(0.78);
+}
+.module8 .img10 {
+  width: 40%;
+  height: 100%;
+  background: url("../../img/week8/img10.png") center center no-repeat;
+  background-size: 100% 100%;
+}

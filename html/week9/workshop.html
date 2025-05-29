@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../css/global.css" />
+    <link rel="stylesheet" href="../../css/week9/index.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="main">
+      <div class="header">
+        <div class="headerDom">
+          <div class="starDom">
+            <div class="star"></div>
+            <a href="../../index.html">Home</a>
+          </div>
+          <div class="weekDom">
+            <a href="../week1/index.html">
+              <span>Week1</span>
+              <div class="light"></div>
+            </a>
+            <a href="../week2/index.html">
+              <span>Week2</span>
+              <div class="light"></div>
+            </a>
+            <a href="../week3/index.html">
+              <span>Week3</span>
+              <div class="light"></div>
+            </a>
+            <a href="../week4/index.html">
+              <span>Week4</span>
+              <div class="light"></div>
+            </a>
+            <a href="../week5/index.html">
+              <span>Week5</span>
+              <div class="light"></div>
+            </a>
+            <a href="../week6/index.html">
+              <span>Week6</span>
+              <div class="light"></div>
+            </a>
+            <a href="../week7/index.html">
+              <span>Week7</span>
+              <div class="light"></div>
+            </a>
+            <a href="../week8/index.html">
+              <span>Week8</span>
+              <div class="light"></div>
+            </a>
+            <a href="../week9/index.html">
+              <span>Week9</span>
+              <div class="light lightDom"></div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="center9">
+        <div class="wookBanner">
+          <div class="leftBanner"></div>
+          <div class="rightBanner"></div>
+        </div>
+        <div class="Welcome">Welcome</div>
+        <div class="Yehua">Yehua</div>
+
+        <div class="module">
+          <div class="centerMainBox module1">
+            <div class="top9">Week9</div>
+            <div class="bottom9">
+              <span>This week was our last hands-on Arduino opportunity in class. In this build, our focus shifted from basic circuits to how we could connect and interact with the Arduino in tandem with Processing, specifically, with p5.js code via Web Serial. Although it felt a bit complicated at first, it was really fun and satisfying to see the physical components control the visual changes on the screen</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="module">
+          <div class="module2">
+            <span>A potentiometer is connected to an Arduino Uno (A0 analog input).</span>
+            <span>The Arduino reads the analog value and maps it from a 10-bit range (0–1023) to a smaller 8-bit range (0–255).</span>
+            <span>The mapped value is sent over the serial port to the computer every 50 milliseconds.</span>
+          </div>
+        </div>
+
+        <div class="module">
+          <div class="module3"></div>
+        </div>
+
+        <div class="module">
+          <div class="module4">
+            <div class="left"></div>
+            <div class="right">
+              <span>serial.js is used to establish a Web Serial connection in the browser.</span>
+              <span>Incoming serial data (0–255) is mapped to control the size of a circle on screen.</span>
+              <span>The circle is green and positioned at the center; its size responds in real time to the potentiometer input.</span>
+              <span>The background color also changes according to the data received, giving an added layer of feedback.</span>
+              <span>There is also a mouseMoved() function, allowing mouse positions to be sent back to Arduino, showing two-way communication is possible.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="module">
+          <div class="centerBox module5">
+            <span>This was my first time connecting a physical sensor to the browser and seeing my interaction change something on screen in real time. It was both surprising and satisfying to watch the green circle grow and shrink based on how I turned the knob. The moment the serial data flowed through and the visual changed—everything clicked.</span>
+            <br />
+            <span>Although I’m still new to physical computing, this class has helped me build confidence. Tools and concepts that once felt intimidating now feel accessible. Even though that confidence is often driven by assignment deadlines, it's real progress nonetheless. I now see how sensors, data, and visuals can be combined into interactive design—and that’s something I’d love to explore more in future creative projects.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script></script>
+</html>
