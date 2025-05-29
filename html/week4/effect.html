@@ -1,0 +1,172 @@
+<!-- The collision algorithm was queried using chartGPT to implement the functionality of the balls colliding with each other, as well as the balls colliding with the boundaries and having a bouncing-back feature. -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../css/global.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js"></script>
+    <title>Document</title>
+    <style>
+      .main {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header {
+        height: 50px;
+      }
+
+      .center {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main">
+      <div class="header">
+        <div class="headerDom">
+          <div class="starDom">
+            <div class="star"></div>
+            <a href="../../index.html">Home</a>
+          </div>
+          <div class="weekDom">
+            <a href="../html/week1/index.html">
+              <span>Week1</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week2/index.html">
+              <span>Week2</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week3/index.html">
+              <span>Week3</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week4/index.html">
+              <span>Week4</span>
+              <div class="light lightDom"></div>
+            </a>
+            <a href="../html/week5/index.html">
+              <span>Week5</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week6/index.html">
+              <span>Week6</span>
+              <div class="light"></div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="center" id="center"></div>
+    </div>
+    <script>
+      let balls = [];
+      let ballCount = 10;
+      let growthRate = 0.001;
+      let time = 0;
+      let flashThreshold = 200;
+      let isFlashing = false;
+
+      function setup() {
+        let canvas = createCanvas(windowWidth, windowHeight);
+        canvas.parent("center");
+        for (let i = 0; i < ballCount; i++) {
+          balls.push(createBall());
+        }
+      }
+
+      function draw() {
+        ballCount = ballCount * (1 + growthRate);
+        let newBallCount = Math.floor(ballCount) - balls.length;
+        for (let i = 0; i < newBallCount; i++) {
+          balls.push(createBall());
+        }
+
+        if (balls.length >= flashThreshold) {
+          isFlashing = true;
+        }
+
+        if (isFlashing) {
+          background(random(255), random(255), random(255));
+        } else {
+          background(0);
+        }
+
+        for (let i = 0; i < balls.length; i++) {
+          for (let j = i + 1; j < balls.length; j++) {
+            if (collides(balls[i], balls[j])) {
+              handleCollision(balls[i], balls[j]);
+            }
+          }
+          updateBall(balls[i]);
+          showBall(balls[i]);
+        }
+
+        time += 0.01;
+      }
+
+      function createBall() {
+        return {
+          x: random(width),
+          y: random(height),
+          vx: random(-2, 2),
+          vy: random(-2, 2),
+          size: random(10, 30),
+          color: color(random(255), random(255), random(255)),
+          angle: random(TWO_PI),
+          angularSpeed: random(-0.05, 0.05),
+        };
+      }
+
+      function updateBall(ball) {
+        ball.vx += sin(ball.angle) * 0.1;
+        ball.vy += cos(ball.angle) * 0.1;
+        ball.angle += ball.angularSpeed;
+
+        ball.x += ball.vx;
+        ball.y += ball.vy;
+
+        if (ball.x < 0 || ball.x > width) {
+          ball.vx = -ball.vx;
+        }
+        if (ball.y < 0 || ball.y > height) {
+          ball.vy = -ball.vy;
+        }
+
+        let r = (red(ball.color) + sin(time) * 5) % 255;
+        let g = (green(ball.color) + cos(time) * 5) % 255;
+        let b = (blue(ball.color) + sin(time * 2) * 5) % 255;
+        ball.color = color(r, g, b);
+      }
+
+      function showBall(ball) {
+        fill(ball.color);
+        noStroke();
+        ellipse(ball.x, ball.y, ball.size, ball.size);
+      }
+
+      function collides(ball1, ball2) {
+        let d = dist(ball1.x, ball1.y, ball2.x, ball2.y);
+        return d < (ball1.size + ball2.size) / 2;
+      }
+
+      function handleCollision(ball1, ball2) {
+        let tempVx = ball1.vx;
+        let tempVy = ball1.vy;
+        ball1.vx = ball2.vx;
+        ball1.vy = ball2.vy;
+        ball2.vx = tempVx;
+        ball2.vy = tempVy;
+      }
+    </script>
+  </body>
+</html>

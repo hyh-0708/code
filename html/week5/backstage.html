@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../css/global.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="main">
+      <div class="header">
+        <div class="headerDom">
+          <div class="starDom">
+            <div class="star"></div>
+            <a href="../../index.html">Home</a>
+          </div>
+          <div class="weekDom">
+            <a href="../html/week1/index.html">
+              <span>Week1</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week2/index.html">
+              <span>Week2</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week3/index.html">
+              <span>Week3</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week4/index.html">
+              <span>Week4</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week5/index.html">
+              <span>Week5</span>
+              <div class="light lightDom"></div>
+            </a>
+            <a href="../html/week6/index.html">
+              <span>Week6</span>
+              <div class="light"></div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="center">
+        <div class="wook5banner">
+          <div class="week5Img">
+            <img src="/img/week5Img1.png" alt="" />
+          </div>
+          <div class="week5Img">
+            <img src="/img/week5Img2.jpg" alt="" />
+          </div>
+        </div>
+        <div class="Welcome">Welcome</div>
+        <div class="Yehua">Yehua</div>
+
+        <div class="centerMain">
+          <div class="centerMainBox">
+            <div class="centerMainBox3">
+              <div class="left">
+                <div class="leftTop">Code</div>
+                <div class="leftBottom week5Code">
+                  <pre>
+                    <code>
+                    </code>
+                   </pre>
+                </div>
+              </div>
+              <div class="right">
+                <div class="leftTop">idea</div>
+                <div class="rightBottom" style="padding: 30px; color: #fff">Week 5’s project is also created using p5.js code learned in class, with a focus on webcam interaction. The page utilizes a live webcam feed to express a world inspired by traditional ink painting aesthetics. The creative concept draws from my first and second assignments in the 2024 course Graphic Design Studio 2: Image & Media, where I explored the themes of book design and Chinese ink painting.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    const codeToAdd = `let capture;
+let threshold1 = 140;
+let threshold2 = 180
+function setup() {
+  let canvas = createCanvas(window.innerWidth, window.innerHeight - 50);
+  canvas.parent("center");
+  capture = createCapture(VIDEO);
+  capture.size(window.innerWidth, window.innerHeight - 50);
+  capture.hide();
+
+function draw() {
+  capture.loadPixels();
+  for (let y = 0; y < capture.height; y++) {
+    for (let x = 0; x < capture.width / 2; x++) {
+      let index = (y * capture.width + x) * 4;
+      let r = capture.pixels[index];
+      let g = capture.pixels[index + 1];
+      let b = capture.pixels[index + 2];
+      let gray = r * 0.299 + g * 0.587 + b * 0.114;
+      if (gray > threshold1) {
+        capture.pixels[index] = 255;
+        capture.pixels[index + 1] = 255;
+        capture.pixels[index + 2] = 255;
+      } else {
+        capture.pixels[index] = 0;
+        capture.pixels[index + 1] = 0;
+        capture.pixels[index + 2] = 0;
+      }
+    }
+  }
+  capture.updatePixels();
+  image(capture, 0, 0, window.innerWidth / 2, window.innerHeight)
+  capture.loadPixels();
+  for (let y = 0; y < capture.height; y++) {
+    for (let x = capture.width / 2; x < capture.width; x++) {
+      let index = (y * capture.width + x) * 4;
+      let r = capture.pixels[index];
+      let g = capture.pixels[index + 1];
+      let b = capture.pixels[index + 2];
+      let gray = r * 0.299 + g * 0.587 + b * 0.114;
+      if (gray > threshold2) {
+        capture.pixels[index] = 255;
+        capture.pixels[index + 1] = 255;
+        capture.pixels[index + 2] = 255;
+      } else {
+        capture.pixels[index] = 0;
+        capture.pixels[index + 1] = 0;
+        capture.pixels[index + 2] = 0;
+      }
+    }
+  }
+  capture.updatePixels();
+  image(capture, window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight);
+}`;
+    const codeElement = document.querySelector(".week5Code code");
+    codeElement.textContent = codeToAdd;
+  </script>
+</html>

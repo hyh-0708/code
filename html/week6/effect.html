@@ -1,0 +1,245 @@
+<!-- I queried GPT about how to draw a half-moon, as well as how to create the effects of dragging stars and the falling trails of stars. -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../css/global.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js"></script>
+    <title>Document</title>
+    <style>
+      .main {
+        width: 100%;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .header {
+        height: 50px;
+      }
+
+      .center {
+        flex: 1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="main">
+      <div class="header">
+        <div class="headerDom">
+          <div class="starDom">
+            <div class="star"></div>
+            <a href="../../index.html">Home</a>
+          </div>
+          <div class="weekDom">
+            <a href="../html/week1/index.html">
+              <span>Week1</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week2/index.html">
+              <span>Week2</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week3/index.html">
+              <span>Week3</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week4/index.html">
+              <span>Week4</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week5/index.html">
+              <span>Week5</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week6/index.html">
+              <span>Week6</span>
+              <div class="light lightDom"></div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="center" id="center"></div>
+    </div>
+    <script>
+      let stars = [];
+      let numStars = 50;
+      let connectionDistance = 150;
+      let draggedStar = null;
+      let offsetX, offsetY;
+      let time = 0;
+      let infoDiv;
+      const fallSpeed = 5;
+      const dragTimeLimit = 1000;
+      let dragStartTime;
+      let moonX = 0;
+      let moonY = 0;
+      let isMoonDragged = false;
+      let moonOffsetX, moonOffsetY;
+      let scaleFactor = 1.5;
+
+      function setup() {
+        let canvas = createCanvas(windowWidth, windowHeight);
+        canvas.parent("center");
+        moonX = width / 2;
+        moonY = height / 2;
+        for (let i = 0; i < numStars; i++) {
+          let x = random(width);
+          let y = random(height);
+          stars.push({
+            x: x,
+            y: y,
+            vx: random(-0.5, 0.5),
+            vy: random(-0.5, 0.5),
+            phase: random(TWO_PI),
+            trail: [],
+            showTrail: false,
+          });
+        }
+        infoDiv = createElement("div");
+        infoDiv.id("info");
+      }
+
+      function draw() {
+        background(0);
+        time += 0.02;
+
+        for (let i = stars.length - 1; i >= 0; i--) {
+          let star = stars[i];
+          if (star !== draggedStar) {
+            star.x += star.vx;
+            star.y += star.vy;
+
+            if (star.x < 0 || star.x > width) {
+              star.vx = -star.vx;
+            }
+            if (star.y < 0 || star.y > height) {
+              star.vy = -star.vy;
+            }
+            star.showTrail = false;
+          } else {
+            star.showTrail = true;
+            if (millis() - dragStartTime > dragTimeLimit) {
+              star.vy = fallSpeed;
+            }
+          }
+
+          if (star.showTrail) {
+            stroke(255, 255, 255, 50);
+            for (let j = 0; j < star.trail.length - 1; j++) {
+              line(star.trail[j].x, star.trail[j].y, star.trail[j + 1].x, star.trail[j + 1].y);
+            }
+
+            star.trail.push({ x: star.x, y: star.y });
+            if (star.trail.length > 50) {
+              star.trail.shift();
+            }
+          } else {
+            star.trail = [];
+          }
+
+          let alpha = map(sin(time + star.phase), -1, 1, 50, 255);
+          fill(135, 206, 250, alpha);
+          drawStar(star.x, star.y, 10);
+
+          for (let j = 0; j < stars.length; j++) {
+            if (j !== i) {
+              let d = dist(star.x, star.y, stars[j].x, stars[j].y);
+              if (d < connectionDistance) {
+                let alpha = map(d, 0, connectionDistance, 255, 0);
+                stroke(255, 255, 255, alpha);
+                line(star.x, star.y, stars[j].x, stars[j].y);
+              }
+            }
+          }
+
+          if (star.y > height) {
+            stars.splice(i, 1);
+          }
+        }
+
+        fill(255, 255, 200);
+        noStroke();
+        ellipse(moonX, moonY, 100 * scaleFactor, 100 * scaleFactor);
+        fill(0);
+        ellipse(moonX + 28 * scaleFactor, moonY, 100 * scaleFactor, 100 * scaleFactor);
+
+        let eyeRadius = 10;
+        let pupilRadius = 4;
+        let leftEyeX = moonX - 30;
+        let leftEyeY = moonY - 20;
+        let rightEyeX = moonX + 30;
+        let rightEyeY = moonY - 20;
+
+        let leftEyeAngle = atan2(mouseY - leftEyeY, mouseX - leftEyeX);
+        let leftPupilX = leftEyeX + cos(leftEyeAngle) * (eyeRadius - pupilRadius);
+        let leftPupilY = leftEyeY + sin(leftEyeAngle) * (eyeRadius - pupilRadius);
+
+        fill(0);
+        ellipse(leftEyeX, leftEyeY, eyeRadius * 2, eyeRadius * 2);
+        fill(255);
+        ellipse(leftPupilX, leftPupilY, pupilRadius * 2, pupilRadius * 2);
+      }
+
+      function mousePressed() {
+        for (let star of stars) {
+          let d = dist(mouseX, mouseY, star.x, star.y);
+          if (d < 10) {
+            draggedStar = star;
+            offsetX = mouseX - star.x;
+            offsetY = mouseY - star.y;
+            dragStartTime = millis();
+            break;
+          }
+        }
+        let moonD = dist(mouseX, mouseY, moonX, moonY);
+        let moonRadius = 50 * scaleFactor;
+        if (moonD < moonRadius) {
+          isMoonDragged = true;
+          moonOffsetX = mouseX - moonX;
+          moonOffsetY = mouseY - moonY;
+        }
+      }
+
+      function mouseDragged() {
+        if (draggedStar) {
+          draggedStar.x = mouseX - offsetX;
+          draggedStar.y = mouseY - offsetY;
+        }
+        if (isMoonDragged) {
+          moonX = mouseX - moonOffsetX;
+          moonY = mouseY - moonOffsetY;
+        }
+      }
+
+      function mouseReleased() {
+        draggedStar = null;
+        isMoonDragged = false;
+      }
+
+      function drawStar(x, y, size) {
+        let numPoints = 5;
+        let angleStep = TWO_PI / numPoints;
+        beginShape();
+        for (let i = 0; i < numPoints * 2; i++) {
+          let r = i % 2 === 0 ? size : size / 2;
+          let angle = i * angleStep;
+          let px = x + r * cos(angle);
+          let py = y + r * sin(angle);
+          vertex(px, py);
+        }
+        endShape(CLOSE);
+      }
+
+      function windowResized() {
+        resizeCanvas(windowWidth, windowHeight);
+      }
+    </script>
+  </body>
+</html>

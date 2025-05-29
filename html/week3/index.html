@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../css/global.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="main">
+      <div class="header">
+        <div class="headerDom">
+          <div class="starDom">
+            <div class="star"></div>
+            <a href="../../index.html">Home</a>
+          </div>
+          <div class="weekDom">
+            <a href="../html/week1/index.html">
+              <span>Week1</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week2/index.html">
+              <span>Week2</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week3/index.html">
+              <span>Week3</span>
+              <div class="light lightDom"></div>
+            </a>
+            <a href="../html/week4/index.html">
+              <span>Week4</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week5/index.html">
+              <span>Week5</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week6/index.html">
+              <span>Week6</span>
+              <div class="light"></div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="center">
+        <div class="banner banner3"></div>
+        <div class="Welcome">
+          Welcome
+          <div class="popup">Pop up</div>
+          <div class="popupContent"></div>
+        </div>
+        <div class="Yehua">Yehua</div>
+
+        <div class="centerMain">
+          <div class="centerMainBox">
+            <div class="describe3">Here are the font and color specifications I used for this assignment</div>
+            <div class="centerMainBox3">
+              <div class="left">
+                <div class="leftTop">Color</div>
+                <div class="leftBottom">
+                  <figure>
+                    <div class="color_0c0c0c colorDom"></div>
+                    <figcaption>0c0c0c</figcaption>
+                  </figure>
+                  <figure>
+                    <div class="color_00a6ff colorDom"></div>
+                    <figcaption>00a6ff</figcaption>
+                  </figure>
+                  <figure>
+                    <div class="color_252525 colorDom"></div>
+                    <figcaption>252525</figcaption>
+                  </figure>
+                  <figure>
+                    <div class="color_5f5f5f colorDom"></div>
+                    <figcaption>5f5f5f</figcaption>
+                  </figure>
+                </div>
+              </div>
+              <div class="right">
+                <div class="leftTop">Typeface</div>
+                <div class="rightBottom">
+                  <div class="row">
+                    <div>Inter-regular</div>
+                    <span>--40px</span>
+                  </div>
+                  <div class="row">
+                    <div>Inter-Bold</div>
+                    <span>--26px</span>
+                  </div>
+                  <div class="row">
+                    <div>Inter-Bold</div>
+                    <span>--38px</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bottom">
+              <div class="bottomTop">Prototype</div>
+              <div class="bottomBottom">
+                <div class="imgDom"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    const popup = document.querySelector(".popup");
+    const popupContent = document.querySelector(".popupContent");
+    const textToDisplay = "This project is nearing its end, after a tough debug it's finally done!We learned how to pop up characters at the end of this project, and it looks like the code is a bit more difficult and is the longest code as of today";
+    let index = 0;
+    let timer;
+
+    popup.addEventListener("click", function (event) {
+      event.stopPropagation();
+      popupContent.textContent = "";
+      popupContent.style.display = "block";
+      index = 0;
+      timer = setInterval(() => {
+        if (index < textToDisplay.length) {
+          popupContent.textContent += textToDisplay[index];
+          index++;
+        } else {
+          clearInterval(timer);
+        }
+      }, 100);
+    });
+
+    document.addEventListener("click", function (event) {
+      if (!popup.contains(event.target) && !popupContent.contains(event.target)) {
+        popupContent.textContent = "";
+        clearInterval(timer);
+        popupContent.style.display = "none";
+      }
+    });
+  </script>
+</html>

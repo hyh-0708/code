@@ -1,0 +1,111 @@
+<!-- I queried GPT about how to split a video into half with a filter applied and half in its original state, and also about how to display the two sets of video simultaneously. -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="../../css/global.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.min.js"></script>
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="main">
+      <div class="header">
+        <div class="headerDom">
+          <div class="starDom">
+            <div class="star"></div>
+            <a href="../../index.html">Home</a>
+          </div>
+          <div class="weekDom">
+            <a href="../html/week1/index.html">
+              <span>Week1</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week2/index.html">
+              <span>Week2</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week3/index.html">
+              <span>Week3</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week4/index.html">
+              <span>Week4</span>
+              <div class="light"></div>
+            </a>
+            <a href="../html/week5/index.html">
+              <span>Week5</span>
+              <div class="light lightDom"></div>
+            </a>
+            <a href="../html/week6/index.html">
+              <span>Week6</span>
+              <div class="light"></div>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div class="center" id="center"></div>
+    </div>
+  </body>
+  <script>
+    let capture;
+    let threshold1 = 140;
+    let threshold2 = 180;
+
+    function setup() {
+      let canvas = createCanvas(window.innerWidth, window.innerHeight - 50);
+      canvas.parent("center");
+      capture = createCapture(VIDEO);
+      capture.size(window.innerWidth, window.innerHeight - 50);
+      capture.hide();
+    }
+
+    function draw() {
+      capture.loadPixels();
+      for (let y = 0; y < capture.height; y++) {
+        for (let x = 0; x < capture.width / 2; x++) {
+          let index = (y * capture.width + x) * 4;
+          let r = capture.pixels[index];
+          let g = capture.pixels[index + 1];
+          let b = capture.pixels[index + 2];
+          let gray = r * 0.299 + g * 0.587 + b * 0.114;
+          if (gray > threshold1) {
+            capture.pixels[index] = 255;
+            capture.pixels[index + 1] = 255;
+            capture.pixels[index + 2] = 255;
+          } else {
+            capture.pixels[index] = 0;
+            capture.pixels[index + 1] = 0;
+            capture.pixels[index + 2] = 0;
+          }
+        }
+      }
+      capture.updatePixels();
+      image(capture, 0, 0, window.innerWidth / 2, window.innerHeight);
+
+      capture.loadPixels();
+      for (let y = 0; y < capture.height; y++) {
+        for (let x = capture.width / 2; x < capture.width; x++) {
+          let index = (y * capture.width + x) * 4;
+          let r = capture.pixels[index];
+          let g = capture.pixels[index + 1];
+          let b = capture.pixels[index + 2];
+          let gray = r * 0.299 + g * 0.587 + b * 0.114;
+          if (gray > threshold2) {
+            capture.pixels[index] = 255;
+            capture.pixels[index + 1] = 255;
+            capture.pixels[index + 2] = 255;
+          } else {
+            capture.pixels[index] = 0;
+            capture.pixels[index + 1] = 0;
+            capture.pixels[index + 2] = 0;
+          }
+        }
+      }
+      capture.updatePixels();
+      image(capture, window.innerWidth / 2, 0, window.innerWidth / 2, window.innerHeight);
+    }
+  </script>
+</html>
