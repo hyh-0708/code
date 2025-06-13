@@ -5,55 +5,131 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FinalPersona</title>
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.8.0/lib/p5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.8.0/lib/addons/p5.sound.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet" />
     <style>
+      body {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        background-color: #111827;
+        color: #f3f4f6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 4px;
+      }
+
+      .main-container {
+        max-width: 896px;
+        width: 100%;
+        background-color: #1f2937;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+
+      /* 按钮容器 */
+      .button-container {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 24px;
+      }
+
+      /* 麦克风按钮 */
       .mic-button {
-        background-color: #3b82f6;
         color: white;
         font-weight: bold;
-        padding: 0.75rem 2rem;
-        border-radius: 0.5rem;
+        padding: 12px 32px;
+        border-radius: 8px;
         transition: all 0.3s ease;
         transform: translateY(0);
         outline: none;
         display: flex;
         align-items: center;
         justify-content: center;
+        border: none;
+        cursor: pointer;
       }
-
-      .mic-button:hover {
+      
+      .mic-button i {
+        margin-right: 8px;
+      }
+      
+      .mic-button.primary {
+        background-color: #3b82f6;
+      }
+      
+      .mic-button.primary:hover {
         background-color: #2563eb;
         transform: translateY(-2px) scale(1.02);
       }
-
-      .mic-button:focus {
+      
+      .mic-button.primary:focus {
         box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
       }
-
-      .mic-button.bg-red-600 {
+      
+      .mic-button.danger {
         background-color: #dc2626;
       }
-
-      .mic-button.bg-red-600:hover {
+      
+      .mic-button.danger:hover {
         background-color: #b91c1c;
+        transform: translateY(-2px) scale(1.02);
       }
-
-      .mic-button.bg-red-600:focus {
+      
+      .mic-button.danger:focus {
         box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.5);
       }
 
-      .mic-button i {
-        margin-right: 0.5rem;
+      /* 内容容器 */
+      .content-container {
+        background-color: #374151;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+      }
+      
+      .status-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      
+      .status-label {
+        font-size: 14px;
+        color: #9ca3af;
+      }
+      
+      .status-value {
+        font-size: 18px;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       }
 
+ 
+
+          /* 画布容器 */
       #canvasContainer {
         position: relative;
         overflow: hidden;
+        width: 100%;
+        background-color: #0f172a;
+        border-radius: 8px;
       }
 
+      /* p5.js画布样式 - 新增 */
+      #canvasContainer canvas {
+        display: block;
+        width: 100% !important;
+        height: 100% !important;
+      }
+
+      /* 权限覆盖层 */
       #permissionOverlay {
         position: absolute;
         top: 0;
@@ -68,157 +144,190 @@
         z-index: 10;
         transition: opacity 0.3s ease;
       }
-
+      
       #permissionOverlay.hidden {
         opacity: 0;
         pointer-events: none;
       }
+      
+      .permission-icon {
+        font-size: 60px;
+        margin-bottom: 16px;
+        color: #6b7280;
+      }
+      
+      .permission-message {
+        font-size: 20px;
+        color: #9ca3af;
+        text-align: center;
+      }
     </style>
-  </head>
-  <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
-    <div class="max-w-4xl w-full bg-gray-800 rounded-xl shadow-2xl p-6 mb-6">
-      <div id="button-container" class="flex justify-center mb-6">
-        <button id="micButton" class="mic-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500"><i class="fa fa-microphone mr-2"></i>Enable Microphone</button>
+  </body>
+  <body>
+    <div class="main-container">
+      <div class="button-container">
+        <button id="micButton" class="mic-button primary">
+           Enable Microphone
+        </button>
       </div>
-      <div class="bg-gray-700 rounded-lg p-4 shadow-inner">
-        <div class="flex justify-between items-center mb-2">
-          <p class="text-sm text-gray-400">Current Amplitude:</p>
-          <span id="amplitudeDisplay" class="text-lg font-mono">0.000</span>
+      <div class="content-container">
+        <div class="status-row">
+          <p class="status-label">Current Amplitude:</p>
+          <span id="amplitudeDisplay" class="status-value">0.000</span>
         </div>
-        <div id="canvasContainer" class="w-full aspect-video bg-gray-900 rounded overflow-hidden">
-          <div id="permissionOverlay" class="w-full h-full flex flex-col items-center justify-center bg-gray-900/90">
-            <i class="fa fa-microphone-slash text-6xl text-gray-500 mb-4"></i>
-            <p class="text-lg text-gray-400">Click the button to enable microphone</p>
+        <div id="canvasContainer">
+          <div id="permissionOverlay">
+            <p class="permission-message">Click the button to enable microphone</p>
           </div>
         </div>
       </div>
     </div>
     <script>
+      // 音频相关变量
       let mic;
       let amplitude;
-      let canvas;
-      let micButton;
       let isMicEnabled = false;
-      let overlay;
-      const AMPLIFICATION_FACTOR = 10;
+      let overlay = document.getElementById('permissionOverlay');
+      let AMPLIFICATION_FACTOR = 10;
+      let audioContext; // 存储音频上下文
 
-      function setup() {
-        canvas = createCanvas(800, 450);
-        canvas.parent("canvasContainer");
-        background(0);
+        
+      document.getElementById('micButton').addEventListener('click', function(){
+        toggleMic()
+      });
 
-        mic = new p5.AudioIn();
-        amplitude = new p5.Amplitude();
-        micButton = select("#micButton");
-        micButton.mousePressed(toggleMic);
+      // 创建p5.js实例
+      let sketch = new p5((p) => {
+        p.setup = function() {
+          let canvas = p.createCanvas(800, 450);
+          canvas.parent("canvasContainer");
+          p.background(0);
+          
+          // 初始化音频对象
+          mic = new p5.AudioIn();
+          amplitude = new p5.Amplitude();
+          
+          // 保存音频上下文以供外部使用
+          audioContext = p.getAudioContext();
+        };
 
-        overlay = document.getElementById("permissionOverlay");
-      }
+        p.draw = function() {
+          p.background(0);
 
-      function draw() {
-        background(0);
-
-        if (isMicEnabled) {
-          if (!mic || !amplitude) {
-            isMicEnabled = false;
-            updateButtonUI(false);
-            return;
-          }
-
-          try {
-            let level = amplitude.getLevel();
-            level = Math.min(level * AMPLIFICATION_FACTOR, 1.0);
-            document.getElementById("amplitudeDisplay").textContent = level.toFixed(3);
-
-            const displayWidth = width * 0.8;
-            const displayHeight = height * 0.8;
-            const radius = map(level, 0, 0.5, 20, displayHeight / 2);
-
-            fill(30, 30, 30);
-            ellipse(width / 2, height / 2, displayHeight, displayHeight);
-
-            fill(65, 105, 225);
-            ellipse(width / 2, height / 2, radius * 2, radius * 2);
-
-            stroke(255);
-            strokeWeight(2);
-            noFill();
-            beginShape();
-            for (let i = 0; i < width; i++) {
-              const x = i;
-              const waveHeight = radius * 0.6;
-              const y = map(sin(i * 0.1 + frameCount * 0.05) * level, -1, 1, height / 2 - waveHeight, height / 2 + waveHeight);
-              vertex(x, y);
+          if (isMicEnabled) {
+            if (!mic || !amplitude) {
+              isMicEnabled = false;
+              updateButtonUI(false);
+              return;
             }
-            endShape();
-          } catch (error) {
-            isMicEnabled = false;
-            updateButtonUI(false);
+
+            try {
+              let level = amplitude.getLevel();
+              level = Math.min(level * AMPLIFICATION_FACTOR, 1.0);
+              document.getElementById("amplitudeDisplay").textContent = level.toFixed(3);
+
+              let displayWidth = p.width * 0.8;
+              let displayHeight = p.height * 0.8;
+              let radius = p.map(level, 0, 0.5, 20, displayHeight / 2);
+
+              p.fill(30, 30, 30);
+              p.ellipse(p.width / 2, p.height / 2, displayHeight, displayHeight);
+
+              p.fill(65, 105, 225);
+              p.ellipse(p.width / 2, p.height / 2, radius * 2, radius * 2);
+
+              p.stroke(255);
+              p.strokeWeight(2);
+              p.noFill();
+              p.beginShape();
+              for (let i = 0; i < p.width; i++) {
+                let x = i;
+                let waveHeight = radius * 0.6;
+                let y = p.map(p.sin(i * 0.1 + p.frameCount * 0.05) * level, -1, 1, p.height / 2 - waveHeight, p.height / 2 + waveHeight);
+                p.vertex(x, y);
+              }
+              p.endShape();
+            } catch (error) {
+              console.error("Error in draw function:", error);
+              isMicEnabled = false;
+              updateButtonUI(false);
+            }
+          } else {
+            p.fill(255);
+            p.textSize(20);
+            p.textAlign(p.CENTER, p.CENTER);
           }
-        } else {
-          fill(255);
-          textSize(20);
-          textAlign(CENTER, CENTER);
-        }
-      }
+        };
 
+        p.windowResized = function() {
+          let container = document.getElementById("canvasContainer");
+          if (container) {
+            let newWidth = container.offsetWidth;
+            let newHeight = newWidth * 0.5625;
+            p.resizeCanvas(newWidth, newHeight);
+          }
+        };
+      });
+
+      // 更新按钮UI
       function updateButtonUI(isEnabled) {
+        let micButton = document.getElementById('micButton');
         if (isEnabled) {
-          micButton.html('<i class="fa fa-microphone-slash mr-2"></i>Disable Microphone');
-          micButton.removeClass("bg-blue-600");
-          micButton.removeClass("hover:bg-blue-700");
-          micButton.addClass("bg-red-600");
-          micButton.addClass("hover:bg-red-700");
+          micButton.innerHTML = 'Disable Microphone';
+          micButton.classList.remove("primary");
+          micButton.classList.add("danger");
         } else {
-          micButton.html('<i class="fa fa-microphone mr-2"></i>Enable Microphone');
-          micButton.removeClass("bg-red-600");
-          micButton.removeClass("hover:bg-red-700");
-          micButton.addClass("bg-blue-600");
-          micButton.addClass("hover:bg-blue-700");
+          micButton.innerHTML = '<i class="fa fa-microphone mr-2"></i>Enable Microphone';
+          micButton.classList.remove("danger");
+          micButton.classList.add("primary");
         }
       }
 
+      // 切换麦克风状态
       function toggleMic() {
         if (!isMicEnabled) {
-          getAudioContext()
-            .resume()
-            .then(() => {
-              mic.start();
-              setTimeout(() => {
-                try {
-                  amplitude.setInput(mic);
-                  amplitude.smooth(0.8);
-                  overlay.style.display = "none";
-                  updateButtonUI(true);
-                  isMicEnabled = true;
-                } catch (error) {
-                  alert("Microphone activation failed. Please check permissions or try again.");
-                  updateButtonUI(false);
+          // 使用保存的音频上下文
+          if (audioContext) {
+            audioContext.resume()
+              .then(() => {
+                if (mic) {
+                  mic.start();
+                  setTimeout(() => {
+                    try {
+                      if (amplitude) {
+                        amplitude.setInput(mic);
+                        amplitude.smooth(0.8);
+                        overlay.style.display = "none";
+                        updateButtonUI(true);
+                        isMicEnabled = true;
+                      }
+                    } catch (error) {
+                      console.error("Failed to set audio input:", error);
+                      alert("Microphone activation failed. Please check permissions or try again.");
+                      updateButtonUI(false);
+                    }
+                  }, 500);
                 }
-              }, 500);
-            })
-            .catch((error) => {
-              alert("Failed to enable audio: " + error.message);
-            });
+              })
+              .catch((error) => {
+                console.error("Failed to resume audio context:", error);
+                alert("Failed to enable audio: " + error.message);
+              });
+          } else {
+            console.error("Audio context not initialized");
+            alert("Audio system not ready. Please refresh the page.");
+          }
         } else {
-          mic.stop();
-          overlay.style.display = "flex";
-          overlay.innerHTML = `
-          <i class="fa fa-microphone-slash text-6xl text-gray-500 mb-4"></i>
-          <p class="text-lg text-gray-400">Click the button to enable microphone</p>
-        `;
+          if (mic) {
+            mic.stop();
+          }
+          if (overlay) {
+            overlay.style.display = "flex";
+            overlay.innerHTML = `<p class="permission-message">Click the button to enable microphone</p>`;
+          }
 
           updateButtonUI(false);
           isMicEnabled = false;
-        }
-      }
-
-      function windowResized() {
-        const container = document.getElementById("canvasContainer");
-        if (container) {
-          const newWidth = container.offsetWidth;
-          const newHeight = newWidth * 0.5625;
-          resizeCanvas(newWidth, newHeight);
         }
       }
     </script>
