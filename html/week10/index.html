@@ -3,113 +3,173 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>p5.js 麦克风输入示例</title>
+    <title>document</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.8.0/lib/p5.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.8.0/lib/addons/p5.sound.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+    <style>
+      .mic-button {
+        background-color: #3b82f6;
+        color: white;
+        font-weight: bold;
+        padding: 0.75rem 2rem;
+        border-radius: 0.5rem;
+        transition: all 0.3s ease;
+        transform: translateY(0);
+        outline: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .mic-button:hover {
+        background-color: #2563eb;
+        transform: translateY(-2px) scale(1.02);
+      }
+
+      .mic-button:focus {
+        box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.5);
+      }
+
+      .mic-button.bg-red-600 {
+        background-color: #dc2626;
+      }
+
+      .mic-button.bg-red-600:hover {
+        background-color: #b91c1c;
+      }
+
+      .mic-button.bg-red-600:focus {
+        box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.5);
+      }
+
+      .mic-button i {
+        margin-right: 0.5rem;
+      }
+
+      #canvasContainer {
+        position: relative;
+        overflow: hidden;
+      }
+
+      #permissionOverlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(17, 24, 39, 0.9);
+        z-index: 10;
+        transition: opacity 0.3s ease;
+      }
+
+      #permissionOverlay.hidden {
+        opacity: 0;
+        pointer-events: none;
+      }
+    </style>
   </head>
   <body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
     <div class="max-w-4xl w-full bg-gray-800 rounded-xl shadow-2xl p-6 mb-6">
-      <h1 class="text-[clamp(1.5rem,3vw,2.5rem)] font-bold text-center mb-6">麦克风音频可视化</h1>
-      <p class="text-gray-300 mb-6 text-center">点击下方按钮启用麦克风，然后说话或制造一些声音来查看波形变化。</p>
       <div id="button-container" class="flex justify-center mb-6">
-        <button id="micButton" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500">启用麦克风</button>
+        <button id="micButton" class="mic-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-500"><i class="fa fa-microphone mr-2"></i>Enable Microphone</button>
       </div>
       <div class="bg-gray-700 rounded-lg p-4 shadow-inner">
-        <p class="text-sm text-gray-400 mb-2">当前振幅: <span id="amplitudeDisplay">0</span></p>
-        <div id="canvasContainer" class="w-full aspect-video bg-gray-900 rounded"></div>
+        <div class="flex justify-between items-center mb-2">
+          <p class="text-sm text-gray-400">Current Amplitude:</p>
+          <span id="amplitudeDisplay" class="text-lg font-mono">0.000</span>
+        </div>
+        <div id="canvasContainer" class="w-full aspect-video bg-gray-900 rounded overflow-hidden">
+          <div id="permissionOverlay" class="w-full h-full flex flex-col items-center justify-center bg-gray-900/90">
+            <i class="fa fa-microphone-slash text-6xl text-gray-500 mb-4"></i>
+            <p class="text-lg text-gray-400">Click the button to enable microphone</p>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="text-gray-500 text-sm">
-      <p>注意: 浏览器会要求获得麦克风权限。此示例仅在本地处理音频，不会上传任何内容。</p>
-    </div>
-
     <script>
       let mic;
       let amplitude;
       let canvas;
       let micButton;
       let isMicEnabled = false;
-      let audioContext;
-      let isWaitingForMic = false;
+      let overlay;
+      const AMPLIFICATION_FACTOR = 10;
 
       function setup() {
         canvas = createCanvas(800, 450);
         canvas.parent("canvasContainer");
         background(0);
 
-        audioContext = getAudioContext();
-        if (audioContext.state !== "running") {
-          audioContext.suspend();
-        }
-
         mic = new p5.AudioIn();
         amplitude = new p5.Amplitude();
         micButton = select("#micButton");
         micButton.mousePressed(toggleMic);
+
+        overlay = document.getElementById("permissionOverlay");
       }
 
       function draw() {
         background(0);
 
         if (isMicEnabled) {
-          if (!mic || audioContext.state !== "running") {
+          if (!mic || !amplitude) {
             isMicEnabled = false;
             updateButtonUI(false);
             return;
           }
 
-          // 检测麦克风是否真的有输入
-          if (isWaitingForMic) {
-            const level = amplitude.getLevel();
-            if (level > 0.001) {
-              console.log("麦克风已成功获取输入");
-              isWaitingForMic = false;
+          try {
+            let level = amplitude.getLevel();
+            level = Math.min(level * AMPLIFICATION_FACTOR, 1.0);
+            document.getElementById("amplitudeDisplay").textContent = level.toFixed(3);
+
+            const displayWidth = width * 0.8;
+            const displayHeight = height * 0.8;
+            const radius = map(level, 0, 0.5, 20, displayHeight / 2);
+
+            fill(30, 30, 30);
+            ellipse(width / 2, height / 2, displayHeight, displayHeight);
+
+            fill(65, 105, 225);
+            ellipse(width / 2, height / 2, radius * 2, radius * 2);
+
+            stroke(255);
+            strokeWeight(2);
+            noFill();
+            beginShape();
+            for (let i = 0; i < width; i++) {
+              const x = i;
+              const waveHeight = radius * 0.6;
+              const y = map(sin(i * 0.1 + frameCount * 0.05) * level, -1, 1, height / 2 - waveHeight, height / 2 + waveHeight);
+              vertex(x, y);
             }
+            endShape();
+          } catch (error) {
+            isMicEnabled = false;
+            updateButtonUI(false);
           }
-
-          const level = amplitude.getLevel();
-          document.getElementById("amplitudeDisplay").textContent = level.toFixed(3);
-
-          const displayWidth = width * 0.8;
-          const displayHeight = height * 0.8;
-          const radius = map(level, 0, 0.5, 20, displayHeight / 2);
-
-          fill(30, 30, 30);
-          ellipse(width / 2, height / 2, displayHeight, displayHeight);
-
-          fill(65, 105, 225);
-          ellipse(width / 2, height / 2, radius * 2, radius * 2);
-
-          stroke(255);
-          strokeWeight(2);
-          noFill();
-          beginShape();
-          for (let i = 0; i < width; i++) {
-            const x = i;
-            const y = map(sin(i * 0.1 + frameCount * 0.05), -1, 1, height / 2 - radius, height / 2 + radius);
-            vertex(x, y);
-          }
-          endShape();
         } else {
           fill(255);
           textSize(20);
           textAlign(CENTER, CENTER);
-          text("点击上方按钮启用麦克风", width / 2, height / 2);
         }
       }
 
-      // 辅助函数：分离处理多个类名
       function updateButtonUI(isEnabled) {
         if (isEnabled) {
-          micButton.html("禁用麦克风");
-          // 分别移除/添加多个类
+          micButton.html('<i class="fa fa-microphone-slash mr-2"></i>Disable Microphone');
           micButton.removeClass("bg-blue-600");
           micButton.removeClass("hover:bg-blue-700");
           micButton.addClass("bg-red-600");
           micButton.addClass("hover:bg-red-700");
         } else {
-          micButton.html("启用麦克风");
+          micButton.html('<i class="fa fa-microphone mr-2"></i>Enable Microphone');
           micButton.removeClass("bg-red-600");
           micButton.removeClass("hover:bg-red-700");
           micButton.addClass("bg-blue-600");
@@ -119,21 +179,34 @@
 
       function toggleMic() {
         if (!isMicEnabled) {
-          audioContext
+          getAudioContext()
             .resume()
             .then(() => {
               mic.start();
-              amplitude.setInput(mic);
-              // 立即标记为启用（信任浏览器权限）
-              isMicEnabled = true;
-              updateButtonUI(true);
-              console.log("麦克风已启动（信任浏览器权限状态）");
+              setTimeout(() => {
+                try {
+                  amplitude.setInput(mic);
+                  amplitude.smooth(0.8);
+                  overlay.style.display = "none";
+                  updateButtonUI(true);
+                  isMicEnabled = true;
+                } catch (error) {
+                  alert("Microphone activation failed. Please check permissions or try again.");
+                  updateButtonUI(false);
+                }
+              }, 500);
             })
             .catch((error) => {
-              alert("启用失败: " + error);
+              alert("Failed to enable audio: " + error.message);
             });
         } else {
           mic.stop();
+          overlay.style.display = "flex";
+          overlay.innerHTML = `
+          <i class="fa fa-microphone-slash text-6xl text-gray-500 mb-4"></i>
+          <p class="text-lg text-gray-400">Click the button to enable microphone</p>
+        `;
+
           updateButtonUI(false);
           isMicEnabled = false;
         }
